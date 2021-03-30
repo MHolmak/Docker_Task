@@ -1,0 +1,21 @@
+name: Jenkins pipeline auto trigger
+
+on:
+  pull_request:
+    branches:
+      - master
+    types: [closed]
+
+jobs:
+  build:
+    name: Pull request trigger
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+    - name: trigger single Job
+      uses: GNVFish/Docker_Task@master
+      with:
+        url: "http://www.nikita.devmarc.swissre.com:8081/"
+        user: "nikita"
+        token: ${{ secrets.pull_trigger }}
+        job: "Jenkins_PR"
