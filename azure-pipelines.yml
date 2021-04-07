@@ -9,9 +9,6 @@ trigger:
 
 pool: default
 
-resources:
-- repo: self
-
 variables:
   ImageName: 'gnvfish/nginx_task:$(Build.BuildId)'
 
