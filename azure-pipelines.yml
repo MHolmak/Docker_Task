@@ -19,6 +19,8 @@ stages:
   - job: DockerImage
     displayName: Build and push Docker image
     steps:
+    - script: cp ~/docker_task/nginx/privkey.pem ./
+      displayName: 'Copy private key'
     - task: Docker@1
       displayName: 'Build the Docker image'
       inputs:
