@@ -16,8 +16,8 @@ stages:
 - stage: Build
   displayName: Build image
   jobs:  
-  - job: DockerImage
-    displayName: Build and push Docker image
+  - job: DockerImage_Build
+    displayName: Build Docker image
     steps:
     - script: cp ~/docker_task/nginx/privkey.pem ./
       displayName: 'Copy private key'
@@ -32,6 +32,13 @@ stages:
         includeLatestTag: true
         useDefaultContext: false
         buildContext: '.'
+
+- stage: Push
+  displayName: Push image
+  jobs:  
+  - job: DockerImage_Push
+    displayName: Push Docker image
+    steps:
     - task: Docker@1
       displayName: 'Push the Docker image to Dockerhub'
       inputs:
@@ -40,3 +47,18 @@ stages:
         command: 'Push an image'
         imageName: '$(ImageName)'
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+- stage: Run
+  displayName: Run container from newly created image
+  jobs:  
+  - job: DockerContainer_Run
+    displayName: Run Docker container
+    steps:
+     - task: Docker@1
+       displayName: Login to DockerHub
+       inputs:
+         command: login
+         containerregistrytype: 'Container Registry'
+         dockerRegistryEndpoint: 'Docker Hub service connection' 
+     - script: docker run -d -p 8080:80 -p 8443:443 --name ngjnWeb gnvfish/nginx_task
+       displayName: 'Run a docker container from selfcreated image '
